@@ -1,0 +1,76 @@
+<head>
+    <title>OnelChat</title>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+</head>
+<body>
+    <h1 tag="judul">Welcome to OnelChat</h1>
+    <h2 class="status">Not Connected</h2>
+    <h3 class="idDisplay"></h3>
+    <button class="connectButton"/>
+
+</body>
+<script>
+    //Handle browser prefixes
+    navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+    var localStream = null;
+    // Get access to microphone
+    navigator.getUserMedia (
+        {video: false, audio: true},
+        
+        // Success callback
+        function success(localAudioStream) {
+            localStream = localAudioStream
+            console.log(localStream)
+            // playStream(localStream)
+        },
+        // Failure callback
+        function error(err) {
+            console.log(err)
+            alert("Audio input device error. Please refresh the website.")
+        }
+    )
+
+    var me = new Peer(/*{key: API_KEY}*/); //use default PeerJS cloud
+    me.on('open', function() {
+        console.log('My PeerJS ID is:', me.id);
+        $(".idDisplay")[0].innerHTML = me.id;
+    });
+
+    var conn = null;
+
+    function connect(connId){
+        console.log("connecting to id ",connId)
+        conn = me.call(connId, localStream);
+        console.log("outgoing stream ",conn)
+        conn.on('stream', function(stream) {
+            playStream(stream)
+        });
+    }
+
+    $(".connectButton").click(
+        ()=>{
+            var connId = prompt("Enter partner ID")
+            connect(connId)
+        }
+    )
+
+    me.on('call', function(incoming) {
+        alert("ada yang call lu")
+        conn = incoming
+        console.log("incoming stream ",conn)
+        conn.on('stream', function(stream) {
+            playStream(stream)
+        });
+    });
+
+    function playStream(stream) {
+        console.log("play stream")
+        var audio = $('<audio autoplay />').appendTo('body');
+        console.log("created")
+        //audio[0].src = (URL || webkitURL || mozURL).createObjectURL(stream);
+        audio[0].srcObject = stream;
+    }
+
+</script>
+
