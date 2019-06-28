@@ -31,7 +31,12 @@
         }
     )
 
-    var me = new Peer(/*{key: API_KEY}*/); //use default PeerJS cloud
+    var me = new Peer({
+        config: {'iceServers': [
+            { url: 'stun:stun.l.google.com:19302' },
+            { url: 'turn:homeo@turn.bistri.com:80', credential: 'homeo' }
+        ]} /* Sample servers, please use appropriate ones */
+    }); //use default PeerJS cloud
     me.on('open', function() {
         console.log('My PeerJS ID is:', me.id);
         $(".idDisplay")[0].innerHTML = me.id;
@@ -58,6 +63,7 @@
     me.on('call', function(incoming) {
         alert("ada yang call lu")
         conn = incoming
+        conn.answer(localStream)
         console.log("incoming stream ",conn)
         conn.on('stream', function(stream) {
             playStream(stream)
