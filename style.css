@@ -1,0 +1,29 @@
+body{
+    padding: 5% 0% 0% 5%;
+}
+.status{
+    margin: 0px 0px 0px 40px;
+    width: 1000px;
+    color: #606060;
+}
+.connectButton{
+    width: 200px;
+    height: 40px;
+    border-radius: 7px 7px 7px 7px;
+    background-color:  #EEEEEE;
+}
+.judul{
+    margin: 0% 0% 2% 0%
+}
+.aaa{
+    display: inline;
+}
+.dot{
+    height: 25px;
+    width: 25px;
+    background-color: darkred;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    margin: 0px 0px 0px 0px;
+}

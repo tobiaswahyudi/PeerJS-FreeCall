@@ -2,12 +2,16 @@
     <title>OnelChat</title>
     <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 tag="judul">Welcome to OnelChat</h1>
-    <h2 class="status">Not Connected</h2>
+    <h1 class="judul">Welcome to OnelChat</h1>
+    <div>
+        <div class="dot"></span>
+        <h2 class="status">Not Connected</h2>
+    </div>
     <h3 class="idDisplay"></h3>
-    <button class="connectButton"/>
+    <button class="connectButton">Connect to Peer</button>
 
 </body>
 <script>
@@ -33,13 +37,15 @@
 
     var me = new Peer({
         config: {'iceServers': [
-            { url: 'stun:stun.l.google.com:19302' },
-            { url: 'turn:homeo@turn.bistri.com:80', credential: 'homeo' }
+            { url: 'stun:stun.l.google.com:19302' }//,
+            // { url: 'turn:homeo@turn.bistri.com:80', credential: 'homeo' }
         ]} /* Sample servers, please use appropriate ones */
     }); //use default PeerJS cloud
     me.on('open', function() {
         console.log('My PeerJS ID is:', me.id);
         $(".idDisplay")[0].innerHTML = me.id;
+        $(".status")[0].innerHTML = "Awaiting Connection"
+        $(".dot")[0].style.backgroundColor = 'gold'
     });
 
     var conn = null;
@@ -50,7 +56,13 @@
         console.log("outgoing stream ",conn)
         conn.on('stream', function(stream) {
             playStream(stream)
+            $(".status")[0].innerHTML = "Connected to Peer"
+            $(".dot")[0].style.backgroundColor = 'aquamarine'
         });
+        conn.on('close',()=>{
+            $(".status")[0].innerHTML = "Awaiting Connection"
+            $(".dot")[0].style.backgroundColor = 'gold'
+        })
     }
 
     $(".connectButton").click(
@@ -68,6 +80,12 @@
         conn.on('stream', function(stream) {
             playStream(stream)
         });
+        conn.on('close',()=>{
+            $(".status")[0].innerHTML = "Awaiting Connection"
+            $(".dot")[0].style.backgroundColor = 'gold'
+        })
+        $(".status")[0].innerHTML = "Connected to Peer"
+        $(".dot")[0].style.backgroundColor = 'aquamarine'
     });
 
     function playStream(stream) {
