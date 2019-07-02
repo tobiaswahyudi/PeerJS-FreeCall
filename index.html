@@ -1,5 +1,5 @@
 <head>
-    <title>OnelChat</title>
+    <title>TobyCall</title>
     <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -38,7 +38,7 @@
     var me = new Peer({
         config: {'iceServers': [
             { url: 'stun:stun.l.google.com:19302' },
-            { url: 'turn:not-a-real-server.abc', username: 'peerjs', credential: 'not-a-real-password' }
+            { url: 'turn:165.22.105.219:65432', username: 'peerjs', credential: 'h2olo2' }
         ]}
     }); //use default PeerJS cloud
     me.on('open', function() {
