@@ -12,7 +12,7 @@
     </div>
     <h3 class="idDisplay"></h3>
     <button class="connectButton">Connect to Peer</button>
-
+    <button class="disconnectButton disabled">Disconnect Call</button>
 </body>
 <script>
     //Handle browser prefixes
@@ -39,8 +39,8 @@
         config: {'iceServers': [
             { url: 'stun:stun.l.google.com:19302' },
             { url: 'turn:165.22.105.219:65432', username: 'peerjs', credential: 'h2olo2' }
-        ]}
-    }); //use default PeerJS cloud
+        ]}          //please don't steal my info
+    });
     me.on('open', function() {
         console.log('My PeerJS ID is:', me.id);
         $(".idDisplay")[0].innerHTML = me.id;
@@ -54,6 +54,9 @@
         console.log("connecting to id ",connId)
         conn = me.call(connId, localStream);
         console.log("outgoing stream ",conn)
+        console.log($('.disconnectButton')[0].classList)
+        $('.disconnectButton')[0].classList.remove('disabled')
+        console.log($('.disconnectButton')[0].classList)
         conn.on('stream', function(stream) {
             playStream(stream)
             $(".status")[0].innerHTML = "Connected to Peer"
@@ -62,6 +65,7 @@
         conn.on('close',()=>{
             $(".status")[0].innerHTML = "Awaiting Connection"
             $(".dot")[0].style.backgroundColor = 'gold'
+            $('.disconnectButton')[0].classList.add('disabled')
         })
     }
 
@@ -76,6 +80,9 @@
         alert("Incoming Call")
         conn = incoming
         conn.answer(localStream)
+        console.log($('.disconnectButton')[0].classList)
+        $('.disconnectButton')[0].classList.remove('disabled')
+        console.log($('.disconnectButton')[0].classList)
         console.log("incoming stream ",conn)
         conn.on('stream', function(stream) {
             playStream(stream)
@@ -83,6 +90,7 @@
         conn.on('close',()=>{
             $(".status")[0].innerHTML = "Awaiting Connection"
             $(".dot")[0].style.backgroundColor = 'gold'
+            $('.disconnectButton')[0].classList.add('disabled')
         })
         $(".status")[0].innerHTML = "Connected to Peer"
         $(".dot")[0].style.backgroundColor = 'aquamarine'
@@ -94,6 +102,13 @@
         console.log("created")
         //audio[0].src = (URL || webkitURL || mozURL).createObjectURL(stream);
         audio[0].srcObject = stream;
+    }
+
+    function disconnectCall(){
+        if(conn){
+            conn.close()
+            conn = null
+        }
     }
 
 </script>

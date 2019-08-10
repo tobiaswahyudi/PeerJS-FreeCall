@@ -12,6 +12,18 @@ body{
     border-radius: 7px 7px 7px 7px;
     background-color:  #EEEEEE;
 }
+
+.disconnectButton{
+    width: 200px;
+    height: 40px;
+    border-radius: 7px 7px 7px 7px;
+    background-color:  #EEEEEE;
+}
+
+.disabled{
+    background-color: #AAAAAA;
+}
+
 .judul{
     margin: 0% 0% 2% 0%
 }
