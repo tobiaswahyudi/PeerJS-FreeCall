@@ -12,7 +12,7 @@
     </div>
     <h3 class="idDisplay"></h3>
     <button class="connectButton">Connect to Peer</button>
-    <button class="disconnectButton disabled">Disconnect Call</button>
+    <button class="disconnectButton disabled" onclick="disconnectCall()">Disconnect Call</button>
 </body>
 <script>
     //Handle browser prefixes
@@ -49,14 +49,18 @@
     });
 
     var conn = null;
+    var dataconn = null;
 
     function connect(connId){
         console.log("connecting to id ",connId)
         conn = me.call(connId, localStream);
-        console.log("outgoing stream ",conn)
-        console.log($('.disconnectButton')[0].classList)
+        dataconn = me.connect(connId)
+        dataconn.on('data',handleData)
+        dataconn.on('close',()=>{
+            conn.close()
+            conn = null
+        })
         $('.disconnectButton')[0].classList.remove('disabled')
-        console.log($('.disconnectButton')[0].classList)
         conn.on('stream', function(stream) {
             playStream(stream)
             $(".status")[0].innerHTML = "Connected to Peer"
@@ -76,13 +80,20 @@
         }
     )
 
+    me.on('connection',(incoming)=>{
+        dataconn = incoming
+        dataconn.on('data',handleData)
+        dataconn.on('close',()=>{
+            conn.close()
+            conn = null
+        })
+    })
+
     me.on('call', function(incoming) {
         alert("Incoming Call")
         conn = incoming
         conn.answer(localStream)
-        console.log($('.disconnectButton')[0].classList)
         $('.disconnectButton')[0].classList.remove('disabled')
-        console.log($('.disconnectButton')[0].classList)
         console.log("incoming stream ",conn)
         conn.on('stream', function(stream) {
             playStream(stream)
@@ -104,11 +115,44 @@
         audio[0].srcObject = stream;
     }
 
-    function disconnectCall(){
-        if(conn){
-            conn.close()
-            conn = null
+    //timeout count
+    var handshakeTimeDelta = 0
+    var isCloseInitiator = false
+
+    function handleData(msg){
+        console.log('Received '+msg)
+        if(msg == 'FIN'){
+            dataconn.send('ACK')
+            if(isCloseInitiator){
+                setTimeout(()=>{
+                    console.log('KILL DATACONN')
+                    dataconn.close()
+                    dataconn = null
+                },handshakeTimeDelta)
+            } else {
+                //10 ms delay
+                setTimeout(dataconn.send('FIN'),10)
+                dataconn
+            }
         }
+        if(msg == 'ACK'){
+            if(isCloseInitiator){
+                handshakeTimeDelta = handshakeTimeDelta - new Date().getTime()
+                console.log(handshakeTimeDelta)
+            } else {
+                    console.log('KILL DATACONN')
+                dataconn.close()
+                dataconn = null
+            }
+        }
+    }
+
+    //implement 4 way handshake
+    function disconnectCall(){
+        console.log('send FIN')
+        dataconn.send('FIN')
+        isCloseInitiator = true
+        handshakeTimeDelta = new Date().getTime()
     }
 
 </script>
